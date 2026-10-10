@@ -65,7 +65,7 @@ test("Playwright Special locators", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.only("Customize timeout at Step level", async ({ page }) => {
+test("Customize timeout at Step level", async ({ page }) => {
   await page.goto("https://rahulshettyacademy.com/angularpractice/");
   //  Configure timeout at step level
   await expect(page.getByText("Protractor Tutorial")).toBeVisible({

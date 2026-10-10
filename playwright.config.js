@@ -1,5 +1,5 @@
 // @ts-check
-import { chromium, defineConfig } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 // Load credentials from the local .env file (not committed)
 process.loadEnvFile(".env");
@@ -16,6 +16,7 @@ export default defineConfig({
   use: {
     browserName: "chromium",
     headless: false,
+    navigationTimeout: 10_000,
   },
 
   reporter: "html",
