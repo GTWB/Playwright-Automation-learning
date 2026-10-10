@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test.only("Playwright Special locators", async ({ page }) => {
+test("Playwright Special locators", async ({ page }) => {
   await page.goto("https://rahulshettyacademy.com/angularpractice/");
   await page.getByLabel("Check me out if you Love IceCreams!").click();
   await page.getByLabel("Gender").selectOption("Female");
@@ -63,4 +63,21 @@ test.only("Playwright Special locators", async ({ page }) => {
   await expect(
     page.locator("tbody tr").filter({ hasText: "Samsung Note 8" }),
   ).toBeVisible();
+});
+
+test.only("Customize timeout at Step level", async ({ page }) => {
+  await page.goto("https://rahulshettyacademy.com/angularpractice/");
+  //  Configure timeout at step level
+  await expect(page.getByText("Protractor Tutorial")).toBeVisible({
+    timeout: 8000,
+  });
+});
+
+test("Customize timeout at Test level", async ({ page }) => {
+  await page.goto("https://rahulshettyacademy.com/angularpractice/");
+  // Configure Timeout at test level
+  const customTimeOut = expect.configure({ timeout: 8000 }); // Configure assertion with custom Timeout and store it in a variable
+
+  // Using customTimeout variable to assert elements within the test
+  await customTimeOut(page.getByText("Protractor Tutorial")).toBeVisible();
 });
