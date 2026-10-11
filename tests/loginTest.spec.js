@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("Login Test and get the first title", async ({ page }) => {
+test("Login Test and e2e test", async ({ page }) => {
   const productName = "ZARA COAT 3";
   let productFound = false;
   await page.goto("https://rahulshettyacademy.com/client/#/auth/login");
@@ -115,4 +115,29 @@ test("Login Test and get the first title", async ({ page }) => {
   }
 
   await expect(page.locator(".col-text")).toHaveText(correctOrderId);
+});
+
+test.only("e2e Test using special playwright locators", async ({ page }) => {
+  await page.goto("https://rahulshettyacademy.com/client/#/auth/login");
+
+  await page.getByPlaceholder("email@example.com").fill(process.env.USER_EMAIL);
+  await page
+    .getByPlaceholder("enter your passsword")
+    .fill(process.env.USER_PASSWORD);
+  await page.getByRole("button").click();
+  await page.locator(".card-body").first().waitFor();
+
+  await page
+    .locator("div.card")
+    .filter({ hasText: "ZARA COAT 3" })
+    .getByRole("button", { name: "Add To Cart" })
+    .click();
+
+  const buttonCart = page
+    .getByRole("listitem")
+    .getByRole("button", { name: "Cart" });
+
+  console.log(await buttonCart.count());
+
+  await buttonCart.click();
 });
