@@ -137,7 +137,20 @@ test.only("e2e Test using special playwright locators", async ({ page }) => {
     .getByRole("listitem")
     .getByRole("button", { name: "Cart" });
 
-  console.log(await buttonCart.count());
+  // console.log(await buttonCart.count());
 
   await buttonCart.click();
+  await page.locator("div li").first().waitFor();
+  await expect(page.getByText("ZARA COAT 3")).toBeVisible();
+  await page.getByRole("button", { name: "Checkout" }).click();
+  await page.getByPlaceholder("Select Country").pressSequentially("united");
+  await page
+    .locator(".ta-results")
+    .filter({ hasText: "United Kingdom" })
+    .click();
+
+  await page.getByRole("combobox").first().selectOption("06");
+  await page.getByRole("combobox").last().selectOption("11");
+  await page.getByText("PLACE ORDER").click();
+  await expect(page.getByText("Thankyou for the order.")).toBeVisible();
 });
