@@ -117,7 +117,7 @@ test("Login Test and e2e test", async ({ page }) => {
   await expect(page.locator(".col-text")).toHaveText(correctOrderId);
 });
 
-test.only("e2e Test using special playwright locators", async ({ page }) => {
+test("e2e Test using special playwright locators", async ({ page }) => {
   await page.goto("https://rahulshettyacademy.com/client/#/auth/login");
 
   await page.getByPlaceholder("email@example.com").fill(process.env.USER_EMAIL);

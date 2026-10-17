@@ -17,6 +17,8 @@ export default defineConfig({
     browserName: "chromium",
     headless: false,
     actionTimeout: 10 * 1000,
+    trace: "retain-on-failure", // Generate trace only if a test will fail
+    screenshot: "on",
   },
 
   reporter: "html",
