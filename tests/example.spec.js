@@ -29,7 +29,7 @@ test("Browser Context PlayWright test", async ({ browser }) => {
   await userName.fill("rahulshettyacademy");
   await signInBtn.click();
 
-  console.log(await page.locator(".card-body a"));
+  console.log(page.locator(".card-body a"));
 
   //   //   Close the context (browser) once is no longer needed
   //   await context.close();
