@@ -23,7 +23,9 @@ test.only("Create new Event", async ({ page }) => {
   // Step 1 - login
   await login(page, process.env.EVENTHUB_URL);
   // Step 2 - Create new event
-  await page.locator("nav a").filter({ hasText: "Events" }).click();
+  const eventMenuButton = page.locator("nav a").filter({ hasText: "Events" });
+
+  await eventMenuButton.click();
   await page.getByRole("button", { name: "Add New Event" }).click();
   await page.getByLabel("Title").fill(eventTitle);
   await page.locator("#admin-event-form textarea").fill(eventTitle);
@@ -35,4 +37,21 @@ test.only("Create new Event", async ({ page }) => {
   await page.locator("#add-event-btn").click();
   await expect(page.getByText("Event created!")).toBeVisible();
   //   Step 3 - Find the Event card and capture seats
+
+  // await page.getByTestId("nav-events").click();
+  await eventMenuButton.click();
+
+  await expect(page.locator("#event-card").last()).toBeVisible();
+
+  await expect(page.getByText(eventTitle)).toBeVisible();
+
+  const eventCards = await page.locator("#event-card").all();
+  console.log(eventCards);
+  for (const event of eventCards) {
+    const title = await event.locator("h3").textContent();
+    if (title === eventTitle) {
+      const text = await event.locator("span").last().textContent();
+      console.log(text);
+    }
+  }
 });
