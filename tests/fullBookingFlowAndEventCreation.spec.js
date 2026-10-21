@@ -46,12 +46,62 @@ test.only("Create new Event", async ({ page }) => {
   await expect(page.getByText(eventTitle)).toBeVisible();
 
   const eventCards = await page.locator("#event-card").all();
-  console.log(eventCards);
+
+  let seatsBeforeBooking;
   for (const event of eventCards) {
     const title = await event.locator("h3").textContent();
     if (title === eventTitle) {
       const text = await event.locator("span").last().textContent();
-      console.log(text);
+      seatsBeforeBooking = parseInt(text.split(" ")[0]);
+      // Step 4 - Start Booking
+      await event.getByRole("link", { name: "Book Now" }).click();
     }
   }
+  // Step 5 - Fill booking form
+  await expect(page.locator("#ticket-count")).toHaveText("1");
+  await page.getByLabel("Full Name").fill(process.env.FULL_NAME);
+  await page.getByLabel("Email").fill(process.env.EVENTHUB_USER_EMAIL);
+  await page.getByPlaceholder("+91 98765 43210").fill("+91 98765 43210");
+  await page.getByRole("button", { name: "Confirm Booking" }).click();
+  // Step 6 - Verify Booking Confirmation
+  await expect(page.locator(".booking-ref")).toBeVisible();
+  let bookingRef = await page.locator(".booking-ref").textContent();
+  bookingRef = bookingRef.trim();
+
+  // Step 7 - Verify in my Bookings page
+  const myBookingsPage = page
+    .locator("nav a")
+    .filter({ hasText: "My Bookings" });
+  await myBookingsPage.click();
+  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}bookings`);
+  await expect(page.locator("#booking-card").first()).toBeVisible();
+
+  const matchedBookingCard = page
+    .locator("#booking-card")
+    .filter({ hasText: `${bookingRef}` });
+  await expect(matchedBookingCard).toBeVisible();
+  await expect(matchedBookingCard).toContainText(eventTitle);
+
+  // Step 8 - Verify seat reduction
+
+  await eventMenuButton.click();
+  await expect(page.getByText(eventTitle)).toBeVisible();
+  const filteredEventCard = page
+    .locator("#event-card")
+    .filter({ hasText: `${eventTitle}` });
+  await expect(filteredEventCard).toBeVisible();
+  let seatsAfterBooking;
+
+  await expect(filteredEventCard.locator("span").last()).toContainText(
+    `${seatsBeforeBooking - 1}`,
+  );
+
+  const seatsText = await filteredEventCard
+    .locator("span")
+    .last()
+    .textContent();
+  seatsAfterBooking = parseInt(seatsText.split(" ")[0]);
+  console.log(seatsAfterBooking);
+  console.log(seatsBeforeBooking);
+  expect(seatsAfterBooking === seatsBeforeBooking - 1).toBeTruthy();
 });
