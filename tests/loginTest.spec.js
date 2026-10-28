@@ -113,7 +113,6 @@ test("Login Test and e2e test", async ({ page }) => {
       break;
     }
   }
-
   await expect(page.locator(".col-text")).toHaveText(correctOrderId);
 });
 
