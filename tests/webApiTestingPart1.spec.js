@@ -1,7 +1,6 @@
 import { test, request, expect } from "@playwright/test";
-
-let token;
-let orderId;
+import { APiUtils } from "./utils/APiUtils";
+let orderObj;
 const dataPayload = {
   userEmail: process.env.USER_EMAIL,
   userPassword: process.env.USER_PASSWORD,
@@ -12,34 +11,14 @@ const createOrderPayload = {
 
 test.beforeAll(async () => {
   const contextApi = await request.newContext();
-  const response = await contextApi.post(
-    "https://rahulshettyacademy.com/api/ecom/auth/login",
-    {
-      data: dataPayload,
-    },
-  );
-  expect(response.ok()).toBeTruthy();
-  const data = await response.json();
-  token = data.token;
-
-  const orderResponse = await contextApi.post(
-    "https://rahulshettyacademy.com/api/ecom/order/create-order",
-    {
-      data: createOrderPayload,
-      headers: {
-        authorization: token,
-      },
-    },
-  );
-  const orderObj = await orderResponse.json();
-  orderId = orderObj.orders[0];
-  console.log(orderId);
+  const apiUtils = new APiUtils(contextApi, dataPayload);
+  orderObj = await apiUtils.createOrder(createOrderPayload);
 });
 
 test("web api login", async ({ page }) => {
   await page.addInitScript((value) => {
     window.localStorage.setItem("token", value);
-  }, token);
+  }, orderObj.token);
 
   await page.goto("https://rahulshettyacademy.com/client/");
 
@@ -49,10 +28,10 @@ test("web api login", async ({ page }) => {
 
   for (const [key, value] of orderIdArray.entries()) {
     const id = await value.textContent();
-    if (id === orderId) {
+    if (id === orderObj.orderId) {
       await page.locator("tbody tr td button[tabindex='0']").nth(key).click();
       break;
     }
   }
-  await expect(page.locator(".col-text")).toHaveText(orderId);
+  await expect(page.locator(".col-text")).toHaveText(orderObj.orderId);
 });
