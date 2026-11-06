@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { NetworkIntercepting } from "./utils/NetworkIntercepting";
 
 const dataPyload = {
   userEmail: process.env.USER_EMAIL,
@@ -10,45 +11,16 @@ const createOrderPayload = {
   ],
 };
 
-let token;
-let orderId;
+let orderData;
 test.beforeAll(async () => {
-  const response = await fetch(
-    "https://rahulshettyacademy.com/api/ecom/auth/login",
-    {
-      method: "POST",
-      body: JSON.stringify(dataPyload),
-      headers: {
-        "Content-type": "application/json",
-      },
-    },
-  );
-
-  expect(response.ok).toBeTruthy();
-
-  const data = await response.json();
-  token = data.token;
-
-  const responseCreateOrder = await fetch(
-    "https://rahulshettyacademy.com/api/ecom/order/create-order",
-    {
-      method: "POST",
-      body: JSON.stringify(createOrderPayload),
-      headers: {
-        "Content-type": "application/json",
-        Authorization: token,
-      },
-    },
-  );
-  const createOrderData = await responseCreateOrder.json();
-  orderId = createOrderData.orders[0];
-  console.log(createOrderData);
+  const apiCall = new NetworkIntercepting(dataPyload, createOrderPayload);
+  orderData = await apiCall.createNewOrder();
 });
 
 test("check order summary page", async ({ page }) => {
   page.addInitScript((value) => {
     window.localStorage.setItem("token", value);
-  }, token);
+  }, orderData.token);
 
   await page.goto("https://rahulshettyacademy.com/client/");
   await page.getByRole("button", { name: "orders" }).click();
@@ -56,11 +28,19 @@ test("check order summary page", async ({ page }) => {
   await page.locator("tr.ng-star-inserted").first().waitFor();
   const allOrdersId = await page.locator("tr.ng-star-inserted").all();
 
-  await page.pause();
-  for (const orderId of allOrdersId) {
-    if ((await orderId.locator("th").textContent()) === orderId) {
-      await page.getByRole("button", { name: "View" }).click();
+  for (const [i, tableRow] of allOrdersId.entries()) {
+    const id = await tableRow.locator("th").textContent();
+
+    if (id === orderData.orderId) {
+      await page.getByRole("button", { name: "View" }).nth(i).click();
       break;
     }
   }
+
+  const orderSummaryId = page.locator(".-main");
+  await expect(orderSummaryId).toContainText(orderData.orderId);
+
+  const country = page.locator(".address").last().locator("p").last();
+
+  await expect(country).toContainText(createOrderPayload.orders[0].country);
 });
