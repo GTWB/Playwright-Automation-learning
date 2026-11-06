@@ -41,12 +41,10 @@ test("orders page with no data mocking API response", async ({ page }) => {
   );
   await page.getByRole("button", { name: "orders" }).click();
 
-  const text = await page
-    .locator('[class="mt-4 ng-star-inserted"]')
-    .textContent();
+  const text = page.locator('[class="mt-4 ng-star-inserted"]');
 
-  await expect(page.locator('[class="mt-4 ng-star-inserted"]')).toHaveText(
-    text,
+  await expect(text).toHaveText(
+    "You have No Orders to show at this time. Please Visit Back Us",
   );
   // wait for current handler calls (if any) to finish
   await page.unrouteAll({ behavior: "wait" });
