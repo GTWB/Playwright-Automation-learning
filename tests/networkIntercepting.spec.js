@@ -17,12 +17,48 @@ test.beforeAll(async () => {
   orderData = await apiCall.createNewOrder();
 });
 
+test("orders page with no data mocking API response", async ({ page }) => {
+  page.addInitScript((value) => {
+    localStorage.setItem("token", value);
+  }, orderData.token);
+
+  await page.goto("https://rahulshettyacademy.com/client/");
+
+  // Mocking a fake response
+
+  // Intercept the request
+  await page.route(
+    "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
+    async (route) => {
+      // get the real response fromm the server
+      const response = await route.fetch();
+      // send the response back to the browser but replace the body with fake data
+      await route.fulfill({
+        body: JSON.stringify({ data: [], message: "No Orders" }),
+        response: response,
+      });
+    },
+  );
+  await page.getByRole("button", { name: "orders" }).click();
+
+  const text = await page
+    .locator('[class="mt-4 ng-star-inserted"]')
+    .textContent();
+
+  await expect(page.locator('[class="mt-4 ng-star-inserted"]')).toHaveText(
+    text,
+  );
+  // wait for current handler calls (if any) to finish
+  await page.unrouteAll({ behavior: "wait" });
+});
+
 test("check order summary page", async ({ page }) => {
   page.addInitScript((value) => {
     window.localStorage.setItem("token", value);
   }, orderData.token);
 
   await page.goto("https://rahulshettyacademy.com/client/");
+
   await page.getByRole("button", { name: "orders" }).click();
 
   await page.locator("tr.ng-star-inserted").first().waitFor();

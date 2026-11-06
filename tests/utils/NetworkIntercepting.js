@@ -34,7 +34,7 @@ export class NetworkIntercepting {
       },
     );
     const createOrderData = await responseCreateOrder.json();
-    console.log(createOrderData);
+
     orderData.orderId = createOrderData.orders[0];
     orderData.token = await this.getToken();
     return orderData;
