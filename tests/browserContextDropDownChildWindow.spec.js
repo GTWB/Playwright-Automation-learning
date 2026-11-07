@@ -2,7 +2,7 @@
 import { expect, test } from "@playwright/test";
 
 test("Browser Context PlayWright test", async ({ browser }) => {
-  //   Create a new incognito browser context
+  //   Create a new browser context
   const context = await browser.newContext();
   // Create a new page inside the context(browser)
   const page = await context.newPage();
