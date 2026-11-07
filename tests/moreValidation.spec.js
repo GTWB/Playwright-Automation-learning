@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.only("Popup validation", async ({ page }) => {
+test("Popup validation", async ({ page }) => {
   await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
   await page.goto("https://www.google.com");
   await page.goBack(); //This method click on the back arrow of browser

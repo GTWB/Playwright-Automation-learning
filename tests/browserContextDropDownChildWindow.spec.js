@@ -60,7 +60,7 @@ test("handling static select dropdown options", async ({ page }) => {
   // assert that the checkbox is not checked
   expect(await checkBox.isChecked()).toBeFalsy();
 
-  await checkBox.click();
+  await checkBox.click({ timeout: 30000 });
   // assert that the checkBox isChecked
   await expect(checkBox).toBeChecked();
 

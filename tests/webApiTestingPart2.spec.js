@@ -20,7 +20,7 @@ test.beforeAll(async ({ browser }) => {
 test("skip login for each test", async () => {
   const page = await webContext.newPage();
   await page.goto("https://rahulshettyacademy.com/client/");
-  await page.pause();
+
   const allProductsTitle = await page
     .locator(".card-body h5 b")
     .allTextContents();

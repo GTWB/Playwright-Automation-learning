@@ -139,7 +139,7 @@ test("e2e Test using special playwright locators", async ({ page }) => {
   // console.log(await buttonCart.count());
 
   await buttonCart.click();
-  await page.locator("div li").first().waitFor();
+  await page.locator("div li").first().waitFor({ timeout: 30000 });
   await expect(page.getByText("ZARA COAT 3")).toBeVisible();
   await page.getByRole("button", { name: "Checkout" }).click();
   await page.getByPlaceholder("Select Country").pressSequentially("united");
