@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { SIX_EVENTS_RESPONSE } from "./utils/eventHubDataMockResponse";
 import { FOUR_EVENTS_RESPONSE } from "./utils/eventHubDataMockResponse";
+import { mockAPI } from "./utils/eventHubDataMockResponse";
 
 let loginToken;
 
@@ -8,19 +9,6 @@ const requestPayload = {
   email: "giuseppes90@gmail.com",
   password: "d8PPgKbk5Hu4aj#",
 };
-
-// Reusable Function mockAPI
-async function mockAPI(page, fakeDataResponse) {
-  await page.route("**/api/events*", async (route) => {
-    // get the response
-    const response = await route.fetch();
-    // send back the response with fake data
-    await route.fulfill({
-      response: response,
-      body: JSON.stringify(fakeDataResponse),
-    });
-  });
-}
 
 test.beforeAll(async () => {
   const response = await fetch(
@@ -74,7 +62,7 @@ test("Banner is NOT visible when 4 events are returned", async ({ page }) => {
 
   //   go to the events page to see the fake data
   await page.locator("#nav-events").click();
-  await page.pause();
+
   //  Get all the event cards
   const eventCards = page.locator("#event-card");
   //   Verify cards loaded from mock

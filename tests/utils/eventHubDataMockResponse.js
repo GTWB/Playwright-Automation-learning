@@ -139,3 +139,16 @@ export const FOUR_EVENTS_RESPONSE = {
   ],
   pagination: { page: 1, totalPages: 1, total: 4, limit: 12 },
 };
+
+// Reusable Function mockAPI
+export async function mockAPI(page, fakeDataResponse) {
+  await page.route("**/api/events*", async (route) => {
+    // get the response
+    const response = await route.fetch();
+    // send back the response with fake data
+    await route.fulfill({
+      response: response,
+      body: JSON.stringify(fakeDataResponse),
+    });
+  });
+}
