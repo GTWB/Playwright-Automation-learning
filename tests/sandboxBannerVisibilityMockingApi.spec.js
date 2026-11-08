@@ -6,8 +6,8 @@ import { mockAPI } from "./utils/eventHubDataMockResponse";
 let loginToken;
 
 const requestPayload = {
-  email: "giuseppes90@gmail.com",
-  password: "d8PPgKbk5Hu4aj#",
+  email: process.env.EVENTHUB_USER_EMAIL,
+  password: process.env.EVENTHUB_PASSWORD,
 };
 
 test.beforeAll(async () => {
