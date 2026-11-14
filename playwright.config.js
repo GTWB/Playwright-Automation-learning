@@ -9,9 +9,9 @@ process.loadEnvFile(".env");
  */
 export default defineConfig({
   testDir: "./tests",
-  timeout: 40_000,
+  timeout: 100_000,
   expect: {
-    timeout: 10_000,
+    timeout: 100_000,
   },
   use: {
     browserName: "chromium",

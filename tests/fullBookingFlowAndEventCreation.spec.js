@@ -73,7 +73,7 @@ test("Create new Event", async ({ page }) => {
     .locator("nav a")
     .filter({ hasText: "My Bookings" });
   await myBookingsPage.click();
-  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}bookings`);
+  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}/bookings`);
   await expect(page.locator("#booking-card").first()).toBeVisible();
 
   const matchedBookingCard = page
@@ -101,8 +101,7 @@ test("Create new Event", async ({ page }) => {
     .last()
     .textContent();
   seatsAfterBooking = parseInt(seatsText.split(" ")[0]);
-  console.log(seatsAfterBooking);
-  console.log(seatsBeforeBooking);
+
   expect(seatsAfterBooking === seatsBeforeBooking - 1).toBeTruthy();
 });
 
@@ -112,7 +111,7 @@ test("Single ticket booking is elegible for refund", async ({ page }) => {
 
   // Step 2 - Book first event with 1 ticket
   await page.locator("#nav-events").click();
-  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}events`);
+  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}/events`);
   await page.locator("#event-card").first().locator("#book-now-btn").click();
   await page.getByLabel("Full Name").fill(process.env.FULL_NAME);
   await page.getByLabel("Email").fill(process.env.EVENTHUB_USER_EMAIL);
@@ -120,7 +119,7 @@ test("Single ticket booking is elegible for refund", async ({ page }) => {
   await page.getByRole("button", { name: "Confirm Booking" }).click();
   // Step 3 - Navigate to booking detail
   await page.locator("#nav-bookings").click();
-  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}bookings`);
+  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}/bookings`);
   await page.getByRole("button", { name: "View Details" }).first().click();
   await expect(
     page.getByRole("heading", { name: "Booking Information" }),
@@ -152,24 +151,26 @@ test("Group Ticket booking is NOT elegible for refund", async ({ page }) => {
 
   // Step 2 - Book first event with more then one ticket
   await page.locator("#nav-events").click();
-  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}events`);
+  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}/events`);
   await page.locator("#event-card").first().locator("#book-now-btn").click();
   const plusButton = page.getByRole("button", { name: "+" });
   await plusButton.click();
   await plusButton.click();
+
   await page.getByLabel("Full Name").fill(process.env.FULL_NAME);
   await page.getByLabel("Email").fill(process.env.EVENTHUB_USER_EMAIL);
   await page.getByPlaceholder("+91 98765 43210").fill("+91 98765 43210");
   await page.getByRole("button", { name: "Confirm Booking" }).click();
   // Step 3 - Navigate to booking detail
   await page.locator("#nav-bookings").click();
-  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}bookings`);
+  await expect(page).toHaveURL(`${process.env.EVENTHUB_URL}/bookings`);
   await page.getByRole("button", { name: "View Details" }).first().click();
   await expect(
     page.getByRole("heading", { name: "Booking Information" }),
   ).toBeVisible();
   // Step 4 - Validate booking ref
   const bookingRef = await page.locator("main div>span").first().textContent();
+
   const bookingTitle = await page.locator("h1").textContent();
   const firstCharBookingRef = bookingRef.slice(0, 1).toLowerCase();
   const firstCharBookingTitle = bookingTitle.slice(0, 1).toLowerCase();
@@ -187,4 +188,13 @@ test("Group Ticket booking is NOT elegible for refund", async ({ page }) => {
   await expect(refundResult).toContainText(
     "Group bookings (3 tickets) are non-refundable.",
   );
+
+  await page.getByRole("button", { name: "← Back to My Bookings" }).click();
+  await page
+    .locator("#booking-card")
+    .filter({ hasText: bookingRef })
+    .getByTestId("cancel-booking-btn")
+    .click();
+
+  await page.locator("[role='dialog'] button").last().click();
 });

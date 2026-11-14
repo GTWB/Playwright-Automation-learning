@@ -92,7 +92,7 @@ test("Opening New Tab", async ({ browser }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("https://the-internet.herokuapp.com/windows");
-  await page.pause();
+
   const newPagePromise = context.waitForEvent("page");
   await page.locator("a[href='/windows/new']").click();
   const newPage = await newPagePromise;
