@@ -5,8 +5,8 @@ import { CrossUserBookingAccessDenied } from "./utils/crossUserBookingAccessDeni
 let eventID;
 
 const loginDataPayload = {
-  email: "emailTest@yahoo.com",
-  password: "3xnJ$cw8r2XDc!M",
+  email: process.env.EVENTHUB_YAHOO_USER_TEST_EMAIL,
+  password: process.env.EVENTHUB_YAHOO_USER_TEST_PSW,
 };
 
 test("Cross-User Booking Access Denied", async ({ page }) => {
