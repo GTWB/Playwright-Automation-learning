@@ -15,21 +15,13 @@ test("Browser Context PlayWright test", async ({ browser }) => {
   await userName.fill("pippo");
   await password.fill("Learning@830$3mK2");
   await signInBtn.click();
-  // get text of error message
-  const errorMessage = await page
-    .locator("[style='display: block;']")
-    .textContent();
-  // log the message on console
-  console.log(errorMessage);
 
   await expect(page.locator("[style='display: block;']")).toContainText(
-    `${errorMessage}`,
+    "Incorrect username/password.",
   );
   await userName.fill("");
   await userName.fill("rahulshettyacademy");
   await signInBtn.click();
-
-  console.log(page.locator(".card-body a"));
 
   //   //   Close the context (browser) once is no longer needed
   //   await context.close();
@@ -84,11 +76,15 @@ test("Child windows handling", async ({ browser }) => {
   ]);
 
   const text = await newPage.locator(".red").textContent();
+  console.log(text);
+
   const getEmail = text?.split(" ").at(4);
-  await expect(newPage.locator("p.red")).toHaveText(`${text}`);
+  await expect(newPage.locator("p.red")).toHaveText(
+    "Please email us at mentor@rahulshettyacademy.com with below template to receive response ",
+  );
 
   await userName.fill(`${getEmail}`);
-  console.log(await userName.inputValue());
+
   await expect(userName).toHaveValue(`${getEmail}`);
 });
 
@@ -96,6 +92,7 @@ test("Opening New Tab", async ({ browser }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("https://the-internet.herokuapp.com/windows");
+  await page.pause();
   const newPagePromise = context.waitForEvent("page");
   await page.locator("a[href='/windows/new']").click();
   const newPage = await newPagePromise;

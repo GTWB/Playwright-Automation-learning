@@ -6,9 +6,10 @@ test("Playwright Special locators", async ({ page }) => {
   await page.getByLabel("Gender").selectOption("Female");
   await page.getByPlaceholder("Password").fill("test");
   await page.getByRole("button", { name: "Submit" }).click();
-  await page
-    .getByText("Success! The Form has been submitted successfully!.")
-    .isVisible();
+
+  await expect(
+    page.getByText("Success! The Form has been submitted successfully!."),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Shop" }).click();
 
   // Selecting element from a list using loops
