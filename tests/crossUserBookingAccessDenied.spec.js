@@ -1,19 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { url } from "node:inspector";
-let loginToken;
-let eventID;
+import { login } from "./utils/crossUserBookingAccessDeniedUtils";
+import { CrossUserBookingAccessDenied } from "./utils/crossUserBookingAccessDeniedUtils";
 
-async function login(page, url) {
-  await page.goto(url);
-  await page
-    .getByPlaceholder("you@email.com")
-    .fill(process.env.EVENTHUB_GMAIL_USER_TEST_EMAIL);
-  await page
-    .locator("#password")
-    .fill(process.env.EVENTHUB_GMAIL_USER_TEST_PSW);
-  await page.getByRole("button", { name: "Sign In" }).click();
-  await expect(page.getByText("Browse Events →")).toBeVisible();
-}
+let eventID;
 
 const loginDataPayload = {
   email: "emailTest@yahoo.com",
@@ -22,37 +11,10 @@ const loginDataPayload = {
 
 test("Cross-User Booking Access Denied", async ({ page }) => {
   // Login as Yahoo user Via API
-  const loginResponse = await fetch(
-    "https://api.eventhub.rahulshettyacademy.com/api/auth/login",
-    {
-      method: "POST",
-      body: JSON.stringify(loginDataPayload),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  expect(loginResponse.ok).toBeTruthy();
-  const data = await loginResponse.json();
-  loginToken = data["token"];
+  const utils = new CrossUserBookingAccessDenied(loginDataPayload);
 
   //   Fetch events via API to get a valid eventID
-  const eventsResponse = await fetch(
-    "https://api.eventhub.rahulshettyacademy.com/api/events?*",
-    {
-      method: "GET",
-      headers: {
-        authorization: `Bearer ${loginToken}`,
-      },
-    },
-  );
-
-  expect(eventsResponse.ok).toBeTruthy();
-  const events = await eventsResponse.json();
-
-  eventID = events.data[0].id;
-  console.log(eventID);
+  eventID = await utils.getValidEventID();
 
   const eventBookingPayload = {
     customerName: "yahoo User",
@@ -61,25 +23,9 @@ test("Cross-User Booking Access Denied", async ({ page }) => {
     quantity: 1,
     eventId: eventID,
   };
-
   //   Create a booking via API as Yahoo user
-  const eventBookingResponse = await fetch(
-    "https://api.eventhub.rahulshettyacademy.com/api/bookings",
-    {
-      method: "POST",
-      body: JSON.stringify(eventBookingPayload),
-      headers: {
-        authorization: "Bearer " + loginToken,
-        "content-type": "application/json",
-      },
-    },
-  );
-
-  expect(eventBookingResponse.ok).toBeTruthy();
-  const createBooking = await eventBookingResponse.json();
-
-  const yahooUserBookingId = createBooking.data.id;
-  console.log(yahooUserBookingId);
+  const yahooUserBookingId =
+    await utils.createBookingAndGetID(eventBookingPayload);
 
   // Login as Gmail user via browser UI
   await login(page, process.env.EVENTHUB_URL);
