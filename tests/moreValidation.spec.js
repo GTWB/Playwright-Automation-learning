@@ -29,3 +29,25 @@ test("Popup validation", async ({ page }) => {
     .textContent();
   console.log(textFrame.split(" ")[1]);
 });
+
+// Visual Testing and Screenshot with playwright
+
+test.only("Screenshot with playwright", async ({ page }) => {
+  await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
+  await expect(page.locator("#displayed-text")).toBeVisible(); // A specific element is visible.
+  await page.locator("#hide-textbox").click();
+  await expect(page.locator("#displayed-text")).toBeHidden(); //Ensures that Locator either does not resolve to any DOM node, or resolves to a non-visible one.
+  // Take Screenshot and save the file in the project
+  // await page.screenshot({ path: "screenshot.png" });
+
+  // Take screenshot of specific locator
+  // await page.locator("#opentab").screenshot({ path: "locatorScreen.png" });
+
+  // Visual Testing
+  await page.goto("https://google.com");
+  expect(await page.screenshot()).toMatchSnapshot({
+    name: "matchScreenshot.png",
+  });
+
+  await expect(page).toHaveScreenshot("image.png");
+});
