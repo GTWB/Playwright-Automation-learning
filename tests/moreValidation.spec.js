@@ -32,7 +32,7 @@ test("Popup validation", async ({ page }) => {
 
 // Visual Testing and Screenshot with playwright
 
-test.only("Screenshot with playwright", async ({ page }) => {
+test("Screenshot with playwright", async ({ page }) => {
   await page.goto("https://rahulshettyacademy.com/AutomationPractice/");
   await expect(page.locator("#displayed-text")).toBeVisible(); // A specific element is visible.
   await page.locator("#hide-textbox").click();
