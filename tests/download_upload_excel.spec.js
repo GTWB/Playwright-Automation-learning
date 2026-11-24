@@ -70,6 +70,11 @@ test.only("Download Upload Excel validation", async ({ page }) => {
   const rows = page.locator("[role=row]");
 
   const allRowsArray = await rows.all();
-  await rows.first().waitFor();
-  console.log(await rows.first().locator("[role=cell]").count());
+  for (let r = 1; r < allRowsArray.length; r++) {
+    for (let c = 1; c <= 5; c++) {
+      console.log(
+        await allRowsArray[r].locator(`#cell-${c}-undefined`).textContent(),
+      );
+    }
+  }
 });
