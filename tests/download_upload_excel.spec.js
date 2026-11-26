@@ -28,7 +28,7 @@ async function readExcel(sheet, searchValue) {
       }
     });
   });
-  console.log(coordinate.column, coordinate.row);
+
   return coordinate;
 }
 
@@ -67,14 +67,24 @@ test.only("Download Upload Excel validation", async ({ page }) => {
 
   await page.locator("#fileinput").setInputFiles(filePath);
 
+  //  Getting the update value a put an assertion
   const rows = page.locator("[role=row]");
+  const column = rows.nth(1).locator("[role=cell]");
+
+  const allColArray = await column.all();
 
   const allRowsArray = await rows.all();
+  let elementFound = false;
   for (let r = 1; r < allRowsArray.length; r++) {
-    for (let c = 1; c <= 5; c++) {
-      console.log(
-        await allRowsArray[r].locator(`#cell-${c}-undefined`).textContent(),
-      );
+    for (let c = 1; c <= allColArray.length; c++) {
+      const cellValue = await allRowsArray[r]
+        .locator(`#cell-${c}-undefined`)
+        .textContent();
+      if (cellValue === "blue") {
+        elementFound = true;
+        break;
+      }
     }
   }
+  expect(elementFound).toBeTruthy();
 });
