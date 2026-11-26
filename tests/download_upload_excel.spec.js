@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { hasSubscribers } from "node:diagnostics_channel";
+
 // Importing npm exceljs npm package to be able to manipulate excel files
 const ExcelJS = require("exceljs");
 
@@ -67,24 +67,8 @@ test.only("Download Upload Excel validation", async ({ page }) => {
 
   await page.locator("#fileinput").setInputFiles(filePath);
 
-  //  Getting the update value a put an assertion
-  const rows = page.locator("[role=row]");
-  const column = rows.nth(1).locator("[role=cell]");
-
-  const allColArray = await column.all();
-
-  const allRowsArray = await rows.all();
-  let elementFound = false;
-  for (let r = 1; r < allRowsArray.length; r++) {
-    for (let c = 1; c <= allColArray.length; c++) {
-      const cellValue = await allRowsArray[r]
-        .locator(`#cell-${c}-undefined`)
-        .textContent();
-      if (cellValue === "blue") {
-        elementFound = true;
-        break;
-      }
-    }
-  }
-  expect(elementFound).toBeTruthy();
+  //  Check the update value is present
+  await expect(
+    page.locator("[role=cell]").filter({ hasText: "blue" }),
+  ).toBeVisible();
 });
