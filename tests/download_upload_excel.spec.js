@@ -46,7 +46,7 @@ async function writeExcel(searchValue, updateValue, filePath) {
   await sheet1.workbook.xlsx.writeFile(filePath);
 }
 
-test.only("Download Upload Excel validation", async ({ page }) => {
+test("Download Upload Excel validation", async ({ page }) => {
   const filePath = "/Users/giuseppetropea/Downloads/download.xlsx";
   await page.goto("https://rahulshettyacademy.com/upload-download-test/");
 

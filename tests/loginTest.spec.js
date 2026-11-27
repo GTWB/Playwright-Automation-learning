@@ -9,6 +9,7 @@ test("Login Test and e2e test", async ({ page }) => {
   const products = page.locator(".card-body");
   await userEmail.fill(process.env.USER_EMAIL);
   await password.fill(process.env.USER_PASSWORD);
+  await page.locator("#login").click();
   //   Method 1 to check all the title of products
 
   // //   Start waiting for response of all products
@@ -30,7 +31,6 @@ test("Login Test and e2e test", async ({ page }) => {
   //   await expect(productTitle).toHaveText(productName);
 
   // Method 2
-  await page.locator("#login").click();
   //   selecting first locator. Playwright has ha method that wait for the firts or last element is present in the DOM
   await page.locator(".card-body h5 b").first().waitFor();
   //   get all textContets. Text content does not wait automatically, this is the reason why we waited first for the first element in the row above
